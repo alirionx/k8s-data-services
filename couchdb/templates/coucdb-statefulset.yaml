@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: "couchdb-${service_id}"
+  namespace: "${service_namespace}"
+spec:
+  selector:
+    matchLabels:
+      app: "couchdb-${service_id}"
+  serviceName: "couchdb-${service_id}"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: "couchdb-${service_id}"
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: couchdb
+        image: "${container_image}"
+        ports:
+        - containerPort: 5984
+          name: http
+        env:
+        - name: COUCHDB_USER
+          value: "${service_username}"
+        - name: COUCHDB_PASSWORD
+          value: "${service_password}"
+        volumeMounts:
+        - name: datastore
+          mountPath: /opt/couchdb/data
+  volumeClaimTemplates:
+  - metadata:
+      name: datastore
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      # storageClassName: "my-storage-class"
+      resources:
+        requests:
+          storage: ${datastore_size}Gi
+
