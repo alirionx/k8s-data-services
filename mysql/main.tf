@@ -43,5 +43,15 @@ resource "kubernetes_manifest" "mysql_service" {
     "spec.ports[0].nodePort",
     "spec.externalTrafficPolicy",
   ]
+  wait {
+    fields = {
+      "status.loadBalancer.ingress[0].ip" = "^(\\d+(\\.|$)){4}"
+    }
+  }
+  timeouts {
+    create = "10m"
+    update = "10m"
+    delete = "1m"
+  }
 }
 

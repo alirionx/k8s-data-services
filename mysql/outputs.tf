@@ -8,6 +8,7 @@ data "kubernetes_resources" "mysql_service" {
 }
 
 output "service_enpoint_info" {
+  depends_on = [data.kubernetes_resources.mysql_service]
   value = {
     internal_ip: data.kubernetes_resources.mysql_service.objects[0].spec.clusterIP,
     port: data.kubernetes_resources.mysql_service.objects[0].spec.ports[0].port,

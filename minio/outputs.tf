@@ -8,6 +8,7 @@ data "kubernetes_resources" "minio_service" {
 }
 
 output "service_enpoint_info" {
+  depends_on = [data.kubernetes_resources.minio_service]
   value = {
     internal_ip: data.kubernetes_resources.minio_service.objects[0].spec.clusterIP,
     api_port: data.kubernetes_resources.minio_service.objects[0].spec.ports[0].port,
