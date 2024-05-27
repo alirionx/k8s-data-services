@@ -1,12 +1,11 @@
 
-resource "kubernetes_manifest" "couchdb_statefulset" {
+resource "kubernetes_manifest" "mysql_statefulset" {
   depends_on = [ ]
   manifest = yamldecode (
-    templatefile( "./templates/couchdb-statefulset.yaml", {
+    templatefile( "./templates/mysql-statefulset.yaml", {
       service_id = var.service_id
       service_namespace = var.service_namespace
-      service_username = var.service_username
-      service_password = var.service_password
+      service_root_password = var.service_root_password
       container_image = var.container_image
       datastore_size = var.datastore_size
     })
@@ -28,10 +27,10 @@ resource "kubernetes_manifest" "couchdb_statefulset" {
 }
 
 
-resource "kubernetes_manifest" "couchdb_service" {
-  depends_on = [ kubernetes_manifest.couchdb_statefulset ]
+resource "kubernetes_manifest" "mysql_service" {
+  depends_on = [ kubernetes_manifest.mysql_statefulset ]
   manifest = yamldecode (
-    templatefile( "./templates/couchdb-service.yaml", {
+    templatefile( "./templates/mysql-service.yaml", {
       service_id = var.service_id
       service_namespace = var.service_namespace
       service_endpoint_type = var.service_endpoint_type

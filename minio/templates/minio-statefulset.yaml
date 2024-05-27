@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: "minio-${service_id}"
+  namespace: "${service_namespace}"
+spec:
+  selector:
+    matchLabels:
+      app: "minio-${service_id}"
+  serviceName: "minio-${service_id}"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: "minio-${service_id}"
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: minio
+        image: "${container_image}"
+        ports:
+        - containerPort: 9000
+          name: api
+        - containerPort: 9001
+          name: console
+        env:
+        - name: MINIO_ACCESS_KEY
+          value: "${service_username}"
+        - name: MINIO_SECRET_KEY
+          value: "${service_password}"
+        args:
+        - server
+        - /data
+        - '--console-address'
+        - ":9001"
+        volumeMounts:
+        - name: datastore
+          mountPath: /data
+  volumeClaimTemplates:
+  - metadata:
+      name: datastore
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      # storageClassName: "my-storage-class"
+      resources:
+        requests:
+          storage: ${datastore_size}Gi
+

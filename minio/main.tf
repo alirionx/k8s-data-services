@@ -1,8 +1,8 @@
 
-resource "kubernetes_manifest" "couchdb_statefulset" {
+resource "kubernetes_manifest" "minio_statefulset" {
   depends_on = [ ]
   manifest = yamldecode (
-    templatefile( "./templates/couchdb-statefulset.yaml", {
+    templatefile( "./templates/minio-statefulset.yaml", {
       service_id = var.service_id
       service_namespace = var.service_namespace
       service_username = var.service_username
@@ -28,10 +28,10 @@ resource "kubernetes_manifest" "couchdb_statefulset" {
 }
 
 
-resource "kubernetes_manifest" "couchdb_service" {
-  depends_on = [ kubernetes_manifest.couchdb_statefulset ]
+resource "kubernetes_manifest" "minio_service" {
+  depends_on = [ kubernetes_manifest.minio_statefulset ]
   manifest = yamldecode (
-    templatefile( "./templates/couchdb-service.yaml", {
+    templatefile( "./templates/minio-service.yaml", {
       service_id = var.service_id
       service_namespace = var.service_namespace
       service_endpoint_type = var.service_endpoint_type

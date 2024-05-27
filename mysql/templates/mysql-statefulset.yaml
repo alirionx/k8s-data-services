@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: "mysql-${service_id}"
+  namespace: "${service_namespace}"
+spec:
+  selector:
+    matchLabels:
+      app: "mysql-${service_id}"
+  serviceName: "mysql-${service_id}"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: "mysql-${service_id}"
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: mysql
+        image: "${container_image}"
+        ports:
+        - containerPort: 5984
+          name: http
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "${service_root_password}"
+        volumeMounts:
+        - name: datastore
+          mountPath: /var/lib/mysql
+  volumeClaimTemplates:
+  - metadata:
+      name: datastore
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      # storageClassName: "my-storage-class"
+      resources:
+        requests:
+          storage: ${datastore_size}Gi
+
