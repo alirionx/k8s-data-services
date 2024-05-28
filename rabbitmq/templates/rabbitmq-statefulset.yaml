@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: "rabbitmq-${service_id}"
+  namespace: "${service_namespace}"
+spec:
+  selector:
+    matchLabels:
+      app: "rabbitmq-${service_id}"
+  serviceName: "rabbitmq-${service_id}"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: "rabbitmq-${service_id}"
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: rabbitmq
+        image: "${container_image}"
+        ports:
+        - containerPort: 5672
+          name: api
+        - containerPort: 15672
+          name: console
+        env:
+        - name: RABBITMQ_DEFAULT_USER
+          value: "${service_username}"
+        - name: RABBITMQ_DEFAULT_PASS
+          value: "${service_password}"
+        volumeMounts:
+        - name: datastore
+          mountPath: /var/lib/rabbitmq
+  volumeClaimTemplates:
+  - metadata:
+      name: datastore
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      # storageClassName: "my-storage-class"
+      resources:
+        requests:
+          storage: ${datastore_size}Gi
+
