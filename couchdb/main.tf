@@ -46,7 +46,7 @@ resource "kubernetes_manifest" "couchdb_service" {
   ]
   wait {
     fields = {
-      "status.loadBalancer.ingress[0].ip" = "^(\\d+(\\.|$)){4}"
+      var.service_endpoint_type == "LoadBalancer" ? "status.loadBalancer.ingress[0].ip" : "spec.clusterIP" = "^(\\d+(\\.|$)){4}"
     }
   }
   timeouts {
