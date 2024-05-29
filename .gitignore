@@ -4,3 +4,4 @@
 *.backup
 *.hcl
 *.lock.info
+*.backend.tf
