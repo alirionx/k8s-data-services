@@ -1,9 +1,8 @@
 terraform {
   backend "s3" {
     bucket = "tfstate"
-    endpoints = {
-      s3 = "https://your-minio.local/"
-    }
+    endpoint = "https://your-minio.local/"
+    
     key = "service_name.tfstate"
 
     access_key="geh"

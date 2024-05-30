@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: "consul-tfstate"
+  namespace: "default"
+spec:
+  selector:
+    matchLabels:
+      app: "consul-tfstate"
+  serviceName: "consul-tfstate-service"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: "consul-tfstate"
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: consul
+        image: "consul:1.15"
+        ports:
+        - containerPort: 8500
+          name: http
+        args:
+        - agent
+        - "-server"
+        - "-ui" 
+        - "-node=server-1" 
+        - "-bootstrap-expect=1" 
+        - "-client=0.0.0.0"
+        volumeMounts:
+        - name: datastore
+          mountPath: /consul/data
+  volumeClaimTemplates:
+  - metadata:
+      name: datastore
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      # storageClassName: "my-storage-class"
+      resources:
+        requests:
+          storage: 1Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "consul-tfstate-service"
+  namespace: "default"
+spec:
+  selector:
+    app: "consul-tfstate"
+  type: "ClusterIP"
+  sessionAffinity: None
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
+  ports:
+  - name: api
+    protocol: TCP
+    port: 8500
+    targetPort: 8500
